@@ -1,0 +1,135 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+class Student {
+private:
+    string name;
+    int rollNumber;
+    float cgpa;
+    vector<string> courses;
+
+public:
+    // Default Constructor
+    Student() : name("Unknown"), rollNumber(0), cgpa(0.0f) {}
+
+    // Parameterized Constructor
+    Student(string n, int r, float c) : name(n), rollNumber(r), cgpa(c) {
+        if (cgpa < 0.0 || cgpa > 4.0) {
+            cout << "Invalid CGPA. Setting CGPA to 0.0.\n";
+            cgpa = 0.0;
+        }
+    }
+
+    // Copy Constructor
+    Student(const Student& other)
+        : name(other.name), rollNumber(other.rollNumber), cgpa(other.cgpa), courses(other.courses) {}
+
+    // Destructor
+    ~Student() {
+        // No dynamic memory, just showing destructor call
+        cout << "Destructor called for student: " << name << endl;
+    }
+
+    // Add a course
+    void addCourse(const string& course) {
+        for (const auto& c : courses) {
+            if (c == course) {
+                cout << "Course already added.\n";
+                return;
+            }
+        }
+        courses.push_back(course);
+    }
+
+    // Update CGPA
+    void updateCGPA(float newCGPA) {
+        if (newCGPA >= 0.0 && newCGPA <= 4.0) {
+            cgpa = newCGPA;
+        } else {
+            cout << "Invalid CGPA. Must be between 0.0 and 4.0.\n";
+        }
+    }
+
+    // Display Student Info
+    void displayInfo() const {
+        cout << "\n--- Student Info ---\n";
+        cout << "Name: " << name << "\nRoll No: " << rollNumber << "\nCGPA: " << cgpa << "\nCourses: ";
+        if (courses.empty()) cout << "None";
+        else {
+            for (const auto& course : courses)
+                cout << course << ", ";
+        }
+        cout << endl;
+    }
+
+    int getRollNumber() const {
+        return rollNumber;
+    }
+};
+
+class StudentManagementSystem {
+private:
+    vector<Student> students;
+
+public:
+    // Add student
+    void addStudent(const Student& s) {
+        students.push_back(s);
+    }
+
+    // Search student by roll number
+    void searchStudent(int roll) const {
+        for (const auto& s : students) {
+            if (s.getRollNumber() == roll) {
+                s.displayInfo();
+                return;
+            }
+        }
+        cout << "Student with roll number " << roll << " not found.\n";
+    }
+
+    // Display all students
+    void displayAll() const {
+        if (students.empty()) {
+            cout << "No student records available.\n";
+            return;
+        }
+
+        for (const auto& s : students) {
+            s.displayInfo();
+        }
+    }
+};
+
+// Example main function to test
+int main() {
+    StudentManagementSystem sms;
+
+    Student s1("Alice", 101, 3.5);
+    s1.addCourse("Math");
+    s1.addCourse("Science");
+
+    Student s2("Bob", 102, 3.8);
+    s2.addCourse("English");
+
+    sms.addStudent(s1);
+    sms.addStudent(s2);
+
+    sms.displayAll();
+
+    cout << "\nSearching for roll number 102:\n";
+    sms.searchStudent(102);
+
+    cout << "\nUpdating CGPA of Bob to 4.1 (invalid):\n";
+    s2.updateCGPA(4.1);  // Should not update
+
+    cout << "\nUpdating CGPA of Bob to 3.9:\n";
+    s2.updateCGPA(3.9);
+
+    cout << "\nDisplaying Bob again after CGPA update:\n";
+    s2.displayInfo();
+
+    return 0;
+}
